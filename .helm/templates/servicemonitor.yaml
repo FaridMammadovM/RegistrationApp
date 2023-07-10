@@ -1,0 +1,23 @@
+{{- if .Values.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "address-book-api.fullname" . }}
+  labels: {{- include "address-book-api.labels" . | nindent 4 }}
+    prometheus: prometheus-{{ .Release.Name }}
+    release: prometheus
+spec:
+  endpoints:
+    - port: http
+      {{- if .Values.metrics.serviceMonitor.path }}
+      path: {{ .Values.metrics.serviceMonitor.path }}
+      {{- end }}
+      {{- if .Values.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+  selector:
+    matchLabels: {{- include "address-book-api.selectorLabels" . | nindent 6 }}
+{{- end }}
